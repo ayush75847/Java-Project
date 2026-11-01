@@ -74,6 +74,11 @@ public class PostService {
         return toResponses(postRepository.findByUserIdAndStatusOrderByCreatedAtDesc(userId, PostStatus.ACTIVE));
     }
 
+    // Admin: every post, ACTIVE and INACTIVE
+    public List<PostResponse> getAllPosts() {
+        return toResponses(postRepository.findAllByOrderByCreatedAtDesc());
+    }
+
     // ---------- Update (owner only, admins can NOT edit) ----------
 
     public PostResponse update(String postId, PostRequest request, String userId) {
