@@ -69,6 +69,11 @@ public class PostService {
         return toResponses(postRepository.findByUserIdOrderByCreatedAtDesc(userId));
     }
 
+    // Someone's public profile page: only their ACTIVE posts
+    public List<PostResponse> getActivePostsByUser(String userId) {
+        return toResponses(postRepository.findByUserIdAndStatusOrderByCreatedAtDesc(userId, PostStatus.ACTIVE));
+    }
+
     // ---------- Update (owner only, admins can NOT edit) ----------
 
     public PostResponse update(String postId, PostRequest request, String userId) {
