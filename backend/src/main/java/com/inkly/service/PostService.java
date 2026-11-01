@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.inkly.dto.PostRequest;
 import com.inkly.dto.PostResponse;
@@ -24,10 +25,12 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final ImageService imageService;
 
-    public PostService(PostRepository postRepository, UserRepository userRepository) {
+    public PostService(PostRepository postRepository, UserRepository userRepository, ImageService imageService) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
+        this.imageService = imageService;
     }
 
     // ---------- Create ----------
@@ -94,6 +97,43 @@ public class PostService {
             throw new ApiException(HttpStatus.FORBIDDEN, "You can only delete your own posts");
         }
         postRepository.delete(post);
+        imageService.delete(post.getImagePublicId());
+    }
+
+    // ---------- Image (owner only, one image per post) ----------
+
+    public PostResponse uploadImage(String postId, MultipartFile file, String userId) {
+        Post post = findPost(postId);
+        if (!isOwner(post, userId)) {
+            throw new ApiException(HttpStatus.FORBIDDEN, "Only the author can change the image");
+        }
+
+        String oldPublicId = post.getImagePublicId();
+
+        // 1. upload the new image first, so a failed upload leaves the post unchanged
+        ImageService.UploadedImage image = imageService.upload(file);
+        post.setImageUrl(image.url());
+        post.setImagePublicId(image.publicId());
+        post.setUpdatedAt(Instant.now());
+        Post saved = postRepository.save(post);
+
+        // 2. then remove the old one (replacing an image)
+        imageService.delete(oldPublicId);
+
+        return toResponse(saved);
+    }
+
+    public PostResponse removeImage(String postId, String userId) {
+        Post post = findPost(postId);
+        if (!isOwner(post, userId)) {
+            throw new ApiException(HttpStatus.FORBIDDEN, "Only the author can change the image");
+        }
+
+        imageService.delete(post.getImagePublicId());
+        post.setImageUrl(null);
+        post.setImagePublicId(null);
+        post.setUpdatedAt(Instant.now());
+        return toResponse(postRepository.save(post));
     }
 
     // ---------- Helpers ----------

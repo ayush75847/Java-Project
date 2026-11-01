@@ -12,7 +12,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.http.MediaType;
 
 import com.inkly.dto.ApiResponse;
 import com.inkly.dto.PostRequest;
@@ -69,6 +72,24 @@ public class PostController {
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable String id, Authentication auth) {
         postService.delete(id, auth.getName(), isAdmin(auth));
         return ResponseEntity.ok(ApiResponse.ok("Post deleted", null));
+    }
+
+    // ---------- Image ----------
+
+    // Send as form-data with a field called "image" (adds or replaces the post's
+    // image)
+    @PostMapping(value = "/{id}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ApiResponse<PostResponse>> uploadImage(@PathVariable String id,
+            @RequestParam(value = "image", required = false) MultipartFile image,
+            Authentication auth) {
+        PostResponse post = postService.uploadImage(id, image, auth.getName());
+        return ResponseEntity.ok(ApiResponse.ok("Image uploaded", post));
+    }
+
+    @DeleteMapping("/{id}/image")
+    public ResponseEntity<ApiResponse<PostResponse>> removeImage(@PathVariable String id, Authentication auth) {
+        PostResponse post = postService.removeImage(id, auth.getName());
+        return ResponseEntity.ok(ApiResponse.ok("Image removed", post));
     }
 
     // ---------- Helpers ----------
