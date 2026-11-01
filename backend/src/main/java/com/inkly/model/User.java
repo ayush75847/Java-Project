@@ -25,7 +25,7 @@ public class User {
     private Role role = Role.USER;
     private AuthProvider provider = AuthProvider.LOCAL;
 
-    private boolean verified = false; // becomes true after OTP check
+    private boolean verified = false; 
     private String otp;
     private Instant otpExpiry;
 
