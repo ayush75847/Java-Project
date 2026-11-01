@@ -25,9 +25,10 @@ public class User {
     private Role role = Role.USER;
     private AuthProvider provider = AuthProvider.LOCAL;
 
-    private boolean verified = false; 
+    private boolean verified = false;
     private String otp;
     private Instant otpExpiry;
+    private int otpAttempts;
 
     private Instant createdAt = Instant.now();
 
@@ -125,6 +126,14 @@ public class User {
 
     public void setCreatedAt(Instant createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public int getOtpAttempts() {
+        return otpAttempts;
+    }
+
+    public void setOtpAttempts(int otpAttempts) {
+        this.otpAttempts = otpAttempts;
     }
 
 }

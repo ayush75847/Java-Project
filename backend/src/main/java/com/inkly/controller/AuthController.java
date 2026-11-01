@@ -11,9 +11,11 @@ import org.springframework.security.core.Authentication;
 
 import com.inkly.dto.ApiResponse;
 import com.inkly.dto.AuthResponse;
+import com.inkly.dto.EmailRequest;
 import com.inkly.dto.LoginRequest;
 import com.inkly.dto.RegisterRequest;
 import com.inkly.dto.UserResponse;
+import com.inkly.dto.VerifyOtpRequest;
 import com.inkly.service.AuthService;
 
 import jakarta.validation.Valid;
@@ -32,7 +34,19 @@ public class AuthController {
     public ResponseEntity<ApiResponse<UserResponse>> register(@Valid @RequestBody RegisterRequest request) {
         UserResponse user = authService.register(request);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.ok("User registered successfully", user));
+                .body(ApiResponse.ok("We sent a 6-digit code to " + user.email(), user));
+    }
+
+    @PostMapping("/verify-otp")
+    public ResponseEntity<ApiResponse<AuthResponse>> verifyOtp(@Valid @RequestBody VerifyOtpRequest request) {
+        AuthResponse auth = authService.verifyOtp(request);
+        return ResponseEntity.ok(ApiResponse.ok("Email verified", auth));
+    }
+
+    @PostMapping("/resend-otp")
+    public ResponseEntity<ApiResponse<Void>> resendOtp(@Valid @RequestBody EmailRequest request) {
+        authService.resendOtp(request.email());
+        return ResponseEntity.ok(ApiResponse.ok("A new code was sent to " + request.email(), null));
     }
 
     @PostMapping("/login")

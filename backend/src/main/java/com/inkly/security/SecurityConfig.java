@@ -33,25 +33,27 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(AbstractHttpConfigurer::disable)
-            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/error").permitAll()
-                .requestMatchers("/api/auth/register", "/api/auth/login").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/posts/my").authenticated()
-                .requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/users/**").permitAll()
-                .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                .anyRequest().authenticated())
-            .exceptionHandling(ex -> ex
-                // no token / bad token
-                .authenticationEntryPoint((request, response, e) ->
-                        writeError(response, HttpStatus.UNAUTHORIZED, "Please log in"))
-                // logged in, but wrong role
-                .accessDeniedHandler((request, response, e) ->
-                        writeError(response, HttpStatus.FORBIDDEN, "You are not allowed to do this")))
-            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                .csrf(AbstractHttpConfigurer::disable)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/error").permitAll()
+                        .requestMatchers("/api/auth/register", "/api/auth/login",
+                                "/api/auth/verify-otp", "/api/auth/resend-otp")
+                        .permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/posts/my").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/users/**").permitAll()
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .anyRequest().authenticated())
+                .exceptionHandling(ex -> ex
+                        // no token / bad token
+                        .authenticationEntryPoint((request, response, e) -> writeError(response,
+                                HttpStatus.UNAUTHORIZED, "Please log in"))
+                        // logged in, but wrong role
+                        .accessDeniedHandler((request, response, e) -> writeError(response, HttpStatus.FORBIDDEN,
+                                "You are not allowed to do this")))
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
