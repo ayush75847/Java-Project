@@ -6,6 +6,7 @@ import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import Register from "./pages/Register";
 import VerifyOtp from "./pages/VerifyOtp";
+import OAuthCallback from "./pages/OAuthCallback";
 
 // The map of the app: every URL and the page it shows
 export default function App() {
@@ -13,6 +14,8 @@ export default function App() {
     <Routes>
       <Route element={<MainLayout />}>
         <Route path="/" element={<Home />} />
+        {/* Google sends the user back here (for anyone, logged in or not) */}
+        <Route path="/oauth/callback" element={<OAuthCallback />} />
 
         {/* Only for logged-OUT users */}
         <Route element={<GuestRoute />}>

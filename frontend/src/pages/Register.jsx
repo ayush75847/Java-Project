@@ -12,6 +12,8 @@ import {
   validatePassword,
   validateUsername,
 } from "../utils/validators";
+import GoogleButton from "../components/GoogleButton";
+import Divider from "../components/ui/Divider";
 
 const EMPTY_FORM = {
   username: "",
@@ -83,6 +85,8 @@ export default function Register() {
         </>
       }
     >
+      <GoogleButton label="Sign up with Google" />
+      <Divider />
       <form onSubmit={handleSubmit} className="space-y-4" noValidate>
         <Alert type="error">{serverError}</Alert>
         <FormField

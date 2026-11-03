@@ -32,4 +32,6 @@ export const authService = {
     const res = await api.get("/api/auth/me");
     return res.data.data; // the logged-in user
   },
+
+  googleLoginUrl: `${import.meta.env.VITE_API_URL}/oauth2/authorization/google`,
 };

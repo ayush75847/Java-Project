@@ -8,6 +8,8 @@ import FormField from "../components/ui/FormField";
 import { useAuth } from "../hooks/useAuth";
 import { authService } from "../services/authService";
 import { hasNoErrors, validateEmail } from "../utils/validators";
+import GoogleButton from "../components/GoogleButton";
+import Divider from "../components/ui/Divider";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -73,6 +75,8 @@ export default function Login() {
         </>
       }
     >
+      <GoogleButton />
+      <Divider />
       <form onSubmit={handleSubmit} className="space-y-4" noValidate>
         <Alert type="error">{serverError}</Alert>
         <FormField
