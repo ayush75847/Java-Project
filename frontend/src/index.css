@@ -1,1 +1,54 @@
 @import "tailwindcss";
+
+/*
+  Inkly theme: black + orange (dark).
+  Every component uses these names (bg-surface, text-ink, bg-brand-500...),
+  never raw colors, so the whole look can be changed from this one place.
+*/
+@theme {
+  /* Brand: orange. 500 for buttons, 400 for links/text on dark, 600 for pressed */
+  --color-brand-50: #fff7ed;
+  --color-brand-100: #ffedd5;
+  --color-brand-200: #fed7aa;
+  --color-brand-300: #fdba74;
+  --color-brand-400: #fb923c;
+  --color-brand-500: #f97316;
+  --color-brand-600: #ea580c;
+  --color-brand-700: #c2410c;
+  --color-brand-800: #9a3412;
+  --color-brand-900: #7c2d12;
+  --color-brand-950: #431407;
+
+  /* Surfaces: from the page background up to raised elements */
+  --color-surface: #0a0a0a; /* page background (near black) */
+  --color-surface-raised: #141414; /* cards, navbar */
+  --color-surface-overlay: #1f1f1f; /* inputs, hover, menus */
+
+  /* Text ("ink") */
+  --color-ink: #f5f5f4; /* headings, main text */
+  --color-ink-muted: #a8a29e; /* secondary text */
+  --color-ink-subtle: #8f8883; /* hints, placeholders (still readable: 4.7:1+) */
+  --color-ink-inverse: #0a0a0a; /* text ON orange: black reads best */
+
+  /* Borders */
+  --color-line: #292524;
+  --color-line-strong: #44403c;
+
+  /* Status colors, picked so none of them looks like the brand orange */
+  --color-success: #34d399; /* emerald */
+  --color-danger: #f87171; /* soft red */
+  --color-info: #38bdf8; /* sky blue */
+}
+
+/* Base styles for the whole app */
+:root {
+  color-scheme: dark; /* dark scrollbars, autofill and date pickers */
+}
+
+body {
+  @apply bg-surface text-ink antialiased;
+}
+
+::selection {
+  @apply bg-brand-500 text-ink-inverse;
+}
