@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
+import { toast } from "sonner";
 import { getErrorMessage } from "../api/client";
 import AuthCard from "../components/AuthCard";
 import Alert from "../components/ui/Alert";
@@ -59,6 +60,9 @@ export default function Register() {
         username: form.username.trim(),
         email,
         password: form.password,
+      });
+      toast.success("Account created", {
+        description: `We sent a 6-digit code to ${email}`,
       });
       // Next step: enter the code we just emailed. The email travels in the URL so a refresh keeps it.
       navigate(`/verify?email=${encodeURIComponent(email)}`);

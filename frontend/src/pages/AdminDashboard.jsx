@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router";
+import { toast } from "sonner";
 import { getErrorMessage } from "../api/client";
 import Alert from "../components/ui/Alert";
 import Avatar from "../components/ui/Avatar";
@@ -33,8 +34,6 @@ export default function AdminDashboard() {
   // { type: "role", user, newRole }  or  { type: "delete", post }
   const [pending, setPending] = useState(null);
   const [working, setWorking] = useState(false);
-  const [actionError, setActionError] = useState("");
-  const [success, setSuccess] = useState("");
 
   useEffect(() => {
     let ignore = false;
@@ -53,19 +52,15 @@ export default function AdminDashboard() {
   function switchTab(value) {
     setSearchParams(value === "users" ? {} : { tab: value }, { replace: true });
     setSearch("");
-    setSuccess(""); // messages belong to the tab they came from
-    setActionError("");
   }
 
   async function confirmPending() {
     setWorking(true);
-    setActionError("");
-    setSuccess("");
     try {
       if (pending.type === "role") {
         const updated = await adminService.changeRole(pending.user.id, pending.newRole);
         setUsers((list) => list.map((u) => (u.id === updated.id ? updated : u)));
-        setSuccess(
+        toast.success(
           updated.role === "ADMIN"
             ? `${updated.username} is now an admin`
             : `${updated.username} is no longer an admin`,
@@ -73,10 +68,14 @@ export default function AdminDashboard() {
       } else {
         await postService.remove(pending.post.id);
         setPosts((list) => list.filter((p) => p.id !== pending.post.id));
-        setSuccess(`Deleted "${pending.post.title}"`);
+        toast.success("Post deleted", {
+          description: `"${pending.post.title}" by ${pending.post.author.username}`,
+        });
       }
     } catch (err) {
-      setActionError(getErrorMessage(err));
+      toast.error(pending.type === "role" ? "Couldn't change the role" : "Couldn't delete the post", {
+        description: getErrorMessage(err),
+      });
     } finally {
       setWorking(false);
       setPending(null);
@@ -151,11 +150,6 @@ export default function AdminDashboard() {
           aria-label="Search"
           className="mb-2 w-full rounded-lg border border-line-strong bg-surface-overlay px-3 py-2 text-sm text-ink placeholder:text-ink-subtle outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/30 sm:w-64"
         />
-      </div>
-
-      <div className="mt-4 space-y-3">
-        <Alert type="success">{success}</Alert>
-        <Alert type="error">{actionError}</Alert>
       </div>
 
       <div className="mt-4">

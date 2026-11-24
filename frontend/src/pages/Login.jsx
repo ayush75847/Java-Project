@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router";
+import { toast } from "sonner";
 import { getErrorMessage, getErrorStatus } from "../api/client";
 import AuthCard from "../components/AuthCard";
 import Alert from "../components/ui/Alert";
@@ -24,6 +25,14 @@ export default function Login() {
   // If a protected page sent us here, go back there after login (used from step 9.4)
   const redirectTo = location.state?.from || "/";
 
+  // Sent here by ProtectedRoute (e.g. clicked "Create post" while logged out): say why.
+  // The id stops a second copy (React runs effects twice in development).
+  useEffect(() => {
+    if (location.state?.from) {
+      toast.info("Please log in to continue", { id: "login-required" });
+    }
+  }, [location.state]);
+
   function handleChange(e) {
     setForm({ ...form, [e.target.name]: e.target.value });
     setErrors({ ...errors, [e.target.name]: "" });
@@ -44,12 +53,16 @@ export default function Login() {
     try {
       const { token, user } = await authService.login(email, form.password);
       saveLogin(token, user);
+      toast.success(`Welcome back, ${user.username}!`);
       navigate(redirectTo, { replace: true });
     } catch (err) {
       if (getErrorStatus(err) === 403) {
         // Registered but never verified: send a fresh code and go to the code page.
         // If a code was sent less than a minute ago the backend says "wait": that's fine, it's still valid.
         await authService.resendOtp(email).catch(() => {});
+        toast.info("Please verify your email first", {
+          description: `Enter the code we sent to ${email}`,
+        });
         navigate(`/verify?email=${encodeURIComponent(email)}`);
         return;
       }

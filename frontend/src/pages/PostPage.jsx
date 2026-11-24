@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
+import { toast } from "sonner";
 import { getErrorMessage, getErrorStatus } from "../api/client";
 import PostContent from "../components/PostContent";
 import Alert from "../components/ui/Alert";
@@ -23,7 +24,6 @@ export default function PostPage() {
 
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [deleteError, setDeleteError] = useState("");
 
   // Load the post. Waits for the login check, so the owner can also see their hidden posts.
   useEffect(() => {
@@ -60,12 +60,12 @@ export default function PostPage() {
 
   async function handleDelete() {
     setDeleting(true);
-    setDeleteError("");
     try {
       await postService.remove(post.id);
+      toast.success("Post deleted", { description: post.title });
       navigate(isOwner ? "/my-posts" : "/posts", { replace: true });
     } catch (err) {
-      setDeleteError(getErrorMessage(err));
+      toast.error("Couldn't delete the post", { description: getErrorMessage(err) });
       setDeleting(false);
       setConfirmOpen(false);
     }
@@ -157,7 +157,6 @@ export default function PostPage() {
           )}
         </div>
 
-        {deleteError && <Alert type="error">{deleteError}</Alert>}
       </header>
 
       {post.imageUrl && (

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router";
+import { toast } from "sonner";
 import { tokenStorage } from "../api/client";
 import AuthCard from "../components/AuthCard";
 import Alert from "../components/ui/Alert";
@@ -34,6 +35,9 @@ export default function OAuthCallback() {
       .getMe()
       .then((user) => {
         saveLogin(token, user);
+        toast.success("Signed in with Google", {
+          description: `Welcome, ${user.username}!`,
+        });
         navigate("/", { replace: true });
       })
       .catch(() => {

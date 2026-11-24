@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router";
+import { toast } from "sonner";
 import { getErrorMessage, getErrorStatus } from "../api/client";
 import AuthCard from "../components/AuthCard";
 import Alert from "../components/ui/Alert";
@@ -20,7 +21,6 @@ export default function VerifyOtp() {
 
   const [code, setCode] = useState("");
   const [error, setError] = useState("");
-  const [info, setInfo] = useState("");
   const [loading, setLoading] = useState(false);
   const [resending, setResending] = useState(false);
   // A code was just sent when we arrive here, so start with the cooldown running
@@ -45,7 +45,6 @@ export default function VerifyOtp() {
 
   async function handleVerify(e) {
     e.preventDefault();
-    setInfo("");
     const codeError = validateOtp(code);
     if (codeError) return setError(codeError);
 
@@ -54,6 +53,7 @@ export default function VerifyOtp() {
     try {
       const { token, user } = await authService.verifyOtp(email, code);
       saveLogin(token, user); // verified = logged in straight away
+      toast.success(`Email verified. Welcome to Inkly, ${user.username}!`);
       navigate("/", { replace: true });
     } catch (err) {
       setError(getErrorMessage(err)); // e.g. "Wrong code (3 attempts left)"
@@ -65,10 +65,9 @@ export default function VerifyOtp() {
   async function handleResend() {
     setResending(true);
     setError("");
-    setInfo("");
     try {
       await authService.resendOtp(email);
-      setInfo("A new code is on its way.");
+      toast.success("New code sent", { description: `Check ${email}` });
       setCode("");
     } catch (err) {
       setError(getErrorMessage(err));
@@ -102,7 +101,6 @@ export default function VerifyOtp() {
     >
       <form onSubmit={handleVerify} className="space-y-4" noValidate>
         <Alert type="error">{error}</Alert>
-        <Alert type="success">{info}</Alert>
         <FormField
           id="code"
           label="Verification code"

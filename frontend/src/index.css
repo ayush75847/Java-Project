@@ -53,6 +53,53 @@ body {
   @apply bg-brand-500 text-ink-inverse;
 }
 
+/* ---------- Notifications (Sonner, see AppToaster.jsx) ---------- */
+
+/* Same look as our cards: dark surface, thin border, coloured left edge per type */
+[data-sonner-toast].inkly-toast {
+  --normal-bg: var(--color-surface-raised);
+  --normal-border: var(--color-line-strong);
+  --normal-text: var(--color-ink);
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-line-strong);
+  border-left-width: 4px;
+  color: var(--color-ink);
+  box-shadow: 0 20px 40px -12px rgb(0 0 0 / 0.7);
+  font-size: 0.875rem;
+}
+[data-sonner-toast].inkly-toast [data-description] {
+  color: var(--color-ink-muted);
+}
+[data-sonner-toast].inkly-toast[data-type="success"] {
+  border-left-color: var(--color-success);
+}
+[data-sonner-toast].inkly-toast[data-type="success"] [data-icon] {
+  color: var(--color-success);
+}
+[data-sonner-toast].inkly-toast[data-type="error"] {
+  border-left-color: var(--color-danger);
+}
+[data-sonner-toast].inkly-toast[data-type="error"] [data-icon] {
+  color: var(--color-danger);
+}
+[data-sonner-toast].inkly-toast[data-type="info"] {
+  border-left-color: var(--color-info);
+}
+[data-sonner-toast].inkly-toast[data-type="info"] [data-icon] {
+  color: var(--color-info);
+}
+[data-sonner-toast].inkly-toast[data-type="warning"] {
+  border-left-color: var(--color-brand-500);
+}
+[data-sonner-toast].inkly-toast[data-type="warning"] [data-icon] {
+  color: var(--color-brand-400);
+}
+[data-sonner-toast].inkly-toast [data-close-button] {
+  background: var(--color-surface-overlay);
+  border-color: var(--color-line-strong);
+  color: var(--color-ink-muted);
+}
+
 /* ---------- Home page effects ---------- */
 
 /* Faint square grid behind the hero, fading out towards the edges */

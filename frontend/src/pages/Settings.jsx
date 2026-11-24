@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router";
+import { toast } from "sonner";
 import { getErrorMessage, getErrorStatus } from "../api/client";
-import Alert from "../components/ui/Alert";
 import Avatar from "../components/ui/Avatar";
 import Button from "../components/ui/Button";
 import FormField from "../components/ui/FormField";
@@ -20,8 +20,6 @@ export default function Settings() {
     bio: user.bio || "",
   });
   const [errors, setErrors] = useState({});
-  const [serverError, setServerError] = useState("");
-  const [success, setSuccess] = useState("");
   const [saving, setSaving] = useState(false);
 
   // Only send what really changed (the backend lowercases usernames, so we compare that way)
@@ -37,13 +35,10 @@ export default function Settings() {
   function handleChange(e) {
     setForm({ ...form, [e.target.name]: e.target.value });
     setErrors({ ...errors, [e.target.name]: "" });
-    setSuccess("");
   }
 
   async function handleSubmit(e) {
     e.preventDefault();
-    setServerError("");
-    setSuccess("");
 
     const newErrors = {
       username: validateUsername(form.username),
@@ -58,12 +53,13 @@ export default function Settings() {
       const updated = await userService.updateMe(changes);
       setUser(updated); // the navbar, menu and pages show the new name right away
       setForm({ username: updated.username, bio: updated.bio || "" });
-      setSuccess("Profile updated");
+      toast.success("Profile updated");
     } catch (err) {
       if (getErrorStatus(err) === 409) {
-        setErrors({ ...newErrors, username: getErrorMessage(err) }); // "Username already taken"
+        // "Username already taken" belongs next to the username field
+        setErrors({ ...newErrors, username: getErrorMessage(err) });
       } else {
-        setServerError(getErrorMessage(err));
+        toast.error("Couldn't update your profile", { description: getErrorMessage(err) });
       }
     } finally {
       setSaving(false);
@@ -95,8 +91,6 @@ export default function Settings() {
         </div>
 
         <form onSubmit={handleSubmit} noValidate className="space-y-5">
-          <Alert type="error">{serverError}</Alert>
-          <Alert type="success">{success}</Alert>
 
           <FormField
             id="username"

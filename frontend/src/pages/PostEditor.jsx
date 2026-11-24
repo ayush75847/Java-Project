@@ -1,8 +1,8 @@
 import { lazy, Suspense, useEffect, useState } from "react";
-import { Link, useLocation, useNavigate, useParams } from "react-router";
+import { Link, useNavigate, useParams } from "react-router";
+import { toast } from "sonner";
 import { getErrorMessage, getErrorStatus } from "../api/client";
 import ImagePicker from "../components/ImagePicker";
-import Alert from "../components/ui/Alert";
 import Button from "../components/ui/Button";
 import { useAuth } from "../hooks/useAuth";
 import { postService } from "../services/postService";
@@ -20,7 +20,6 @@ export default function PostEditor() {
   const { id } = useParams();
   const isEdit = Boolean(id);
   const navigate = useNavigate();
-  const location = useLocation();
   const { user } = useAuth();
 
   const [form, setForm] = useState(isEdit ? null : EMPTY_POST); // null = still loading
@@ -29,9 +28,6 @@ export default function PostEditor() {
   const [dirty, setDirty] = useState(false); // unsaved changes?
 
   const [errors, setErrors] = useState({});
-  const [serverError, setServerError] = useState("");
-  // e.g. "Post saved, but the image upload failed" (sent here by the create flow)
-  const [notice, setNotice] = useState(location.state?.notice || "");
   const [loadError, setLoadError] = useState("");
   const [saving, setSaving] = useState(false);
 
@@ -93,19 +89,21 @@ export default function PostEditor() {
 
   async function handleSubmit(e) {
     e.preventDefault();
-    setServerError("");
-    setNotice("");
-    if (!validate()) return;
+    if (!validate()) {
+      // The error text sits next to the field, which may be scrolled out of view
+      toast.error("Please fix the highlighted fields");
+      return;
+    }
 
     setSaving(true);
     const body = { title: form.title.trim(), content: form.content, status: form.status };
 
-    // 1. Save the text. If this fails, nothing was saved: show the error and stay here.
+    // 1. Save the text. If this fails, nothing was saved: say so and stay here.
     let saved;
     try {
       saved = isEdit ? await postService.update(id, body) : await postService.create(body);
     } catch (err) {
-      setServerError(getErrorMessage(err));
+      toast.error("Your post was not saved", { description: getErrorMessage(err) });
       setSaving(false);
       return;
     }
@@ -117,17 +115,22 @@ export default function PostEditor() {
     } catch (err) {
       setDirty(false);
       setSaving(false);
-      const message = `Your post was saved, but the image didn't work: ${getErrorMessage(err)}`;
-      if (isEdit) {
-        setServerError(message);
-      } else {
+      toast.warning("Post saved, but the image didn't work", {
+        description: `${getErrorMessage(err)} You can try the image again here.`,
+        duration: 8000,
+      });
+      if (!isEdit) {
         // The post exists now: continue on its edit page, so trying again doesn't create a copy
-        navigate(`/posts/${saved.id}/edit`, { replace: true, state: { notice: message } });
+        navigate(`/posts/${saved.id}/edit`, { replace: true });
       }
       return;
     }
 
     setDirty(false);
+    toast.success(
+      isEdit ? "Changes saved" : saved.status === "ACTIVE" ? "Post published" : "Saved as a hidden draft",
+      isEdit || saved.status === "ACTIVE" ? undefined : { description: "Only you and admins can see it." },
+    );
     navigate(`/posts/${saved.id}`, { replace: isEdit });
   }
 
@@ -162,8 +165,6 @@ export default function PostEditor() {
           <StatusToggle value={form.status} onChange={(s) => update("status", s)} />
         </div>
 
-        {notice && <Alert type="info">{notice}</Alert>}
-        <Alert type="error">{serverError}</Alert>
 
         {/* Title */}
         <div className="space-y-1.5">

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
+import { toast } from "sonner";
 import { getErrorMessage } from "../api/client";
 import Alert from "../components/ui/Alert";
 import Button from "../components/ui/Button";
@@ -21,7 +22,6 @@ export default function MyPosts() {
   const [filter, setFilter] = useState("ALL");
 
   const [busyId, setBusyId] = useState(null); // the post whose hide/publish is running
-  const [actionError, setActionError] = useState("");
   const [toDelete, setToDelete] = useState(null); // the post in the "Delete?" popup
   const [deleting, setDeleting] = useState(false);
 
@@ -48,7 +48,6 @@ export default function MyPosts() {
 
   async function toggleStatus(post) {
     setBusyId(post.id);
-    setActionError("");
     try {
       // PUT needs the whole post (title + content), not only the status
       const updated = await postService.update(post.id, {
@@ -57,8 +56,13 @@ export default function MyPosts() {
         status: post.status === "ACTIVE" ? "INACTIVE" : "ACTIVE",
       });
       replacePost(updated);
+      if (updated.status === "ACTIVE") {
+        toast.success("Post published", { description: `"${post.title}" is visible to everyone` });
+      } else {
+        toast.success("Post hidden", { description: `Only you and admins can see "${post.title}"` });
+      }
     } catch (err) {
-      setActionError(getErrorMessage(err));
+      toast.error("Couldn't change the post", { description: getErrorMessage(err) });
     } finally {
       setBusyId(null);
     }
@@ -66,15 +70,14 @@ export default function MyPosts() {
 
   async function confirmDelete() {
     setDeleting(true);
-    setActionError("");
     try {
       await postService.remove(toDelete.id);
       setPosts((list) => list.filter((p) => p.id !== toDelete.id));
-      setToDelete(null);
+      toast.success("Post deleted", { description: toDelete.title });
     } catch (err) {
-      setActionError(getErrorMessage(err));
-      setToDelete(null);
+      toast.error("Couldn't delete the post", { description: getErrorMessage(err) });
     } finally {
+      setToDelete(null);
       setDeleting(false);
     }
   }
@@ -146,12 +149,6 @@ export default function MyPosts() {
               </button>
             ))}
           </div>
-
-          {actionError && (
-            <div className="mb-4">
-              <Alert type="error">{actionError}</Alert>
-            </div>
-          )}
 
           {shown.length === 0 ? (
             <p className="py-12 text-center text-sm text-ink-muted">

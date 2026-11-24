@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router";
+import { toast } from "sonner";
 import { useAuth } from "../hooks/useAuth";
 import UserMenu from "./UserMenu";
 
@@ -46,10 +47,27 @@ export default function Navbar() {
     return () => document.removeEventListener("keydown", onKey);
   }, [menuOpen]);
 
-  function handleLogout() {
+  // Log out = go home FIRST, then forget the user.
+  // The other way round, on a page like /settings, ProtectedRoute would notice
+  // "logged out" before the move home and send you to /login instead.
+  const logoutPending = useRef(false);
+
+  function finishLogout() {
+    logoutPending.current = false;
     logout();
+    toast.success("You've been logged out");
+  }
+
+  function handleLogout() {
+    if (location.pathname === "/") return finishLogout(); // already home
+    logoutPending.current = true;
     navigate("/", { replace: true });
   }
+
+  // Runs after every page change: once we've arrived home, finish the logout
+  useEffect(() => {
+    if (logoutPending.current && location.pathname === "/") finishLogout();
+  });
 
   return (
     <header className="sticky top-0 z-20 border-b border-line bg-surface-raised/90 backdrop-blur">
