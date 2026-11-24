@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { tokenStorage } from "../api/client";
+import { getErrorStatus, tokenStorage } from "../api/client";
 import { authService } from "../services/authService";
 import { AuthContext } from "./AuthContext";
 
@@ -14,7 +14,12 @@ export function AuthProvider({ children }) {
     authService
       .getMe()
       .then(setUser)
-      .catch(() => tokenStorage.clear()) // expired or invalid token
+      .catch((err) => {
+        // Only forget the token if the backend REJECTED it (expired, fake, user deleted).
+        // If the server is just down, keep it so the user is still logged in next time.
+        const status = getErrorStatus(err);
+        if (status === 401 || status === 404) tokenStorage.clear();
+      })
       .finally(() => setLoading(false));
   }, []);
 
