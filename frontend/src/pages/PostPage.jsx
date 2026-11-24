@@ -63,7 +63,7 @@ export default function PostPage() {
     setDeleteError("");
     try {
       await postService.remove(post.id);
-      navigate(isOwner ? "/my-posts" : "/", { replace: true });
+      navigate(isOwner ? "/my-posts" : "/posts", { replace: true });
     } catch (err) {
       setDeleteError(getErrorMessage(err));
       setDeleting(false);
@@ -97,7 +97,7 @@ export default function PostPage() {
   return (
     <article className="mx-auto max-w-3xl px-4 py-10">
       <Link
-        to="/"
+        to="/posts"
         className="mb-8 inline-flex items-center gap-1 text-sm text-ink-muted transition hover:text-brand-400"
       >
         <span aria-hidden="true">←</span> All posts
@@ -196,7 +196,7 @@ function PostNotFound() {
         It may have been deleted or hidden by its author.
       </p>
       <Link
-        to="/"
+        to="/posts"
         className="mt-4 inline-block text-brand-400 hover:text-brand-300 hover:underline"
       >
         Back to all posts
