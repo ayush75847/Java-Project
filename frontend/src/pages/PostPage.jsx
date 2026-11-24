@@ -3,13 +3,16 @@ import { Link, useNavigate, useParams } from "react-router";
 import { toast } from "sonner";
 import { getErrorMessage, getErrorStatus } from "../api/client";
 import AuthorBox from "../components/AuthorBox";
+import MoreFromAuthor from "../components/MoreFromAuthor";
 import PostContent from "../components/PostContent";
 import ReadingProgress from "../components/ReadingProgress";
+import ShareButton from "../components/ShareButton";
 import Alert from "../components/ui/Alert";
 import Avatar from "../components/ui/Avatar";
 import Button from "../components/ui/Button";
 import ConfirmDialog from "../components/ui/ConfirmDialog";
 import { useAuth } from "../hooks/useAuth";
+import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { postService } from "../services/postService";
 import { formatDate, readingTime } from "../utils/format";
 import { sizedImage } from "../utils/image";
@@ -48,13 +51,7 @@ export default function PostPage() {
   }, [id, authLoading, reloadKey]);
 
   // Browser tab title: "Post title · Inkly"
-  useEffect(() => {
-    if (!post) return;
-    document.title = `${post.title} · Inkly`;
-    return () => {
-      document.title = "Inkly";
-    };
-  }, [post]);
+  useDocumentTitle(post?.title);
 
   function retry() {
     setError("");
@@ -143,8 +140,9 @@ export default function PostPage() {
             </div>
           </Link>
 
-          {(isOwner || canDelete) && (
-            <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
+              {/* Only published posts: a hidden post's link wouldn't open for anyone else */}
+              {!isHidden && <ShareButton title={post.title} />}
               {isOwner && (
                 <Link
                   to={`/posts/${post.id}/edit`}
@@ -158,8 +156,7 @@ export default function PostPage() {
                   Delete
                 </Button>
               )}
-            </div>
-          )}
+          </div>
         </div>
       </header>
 
@@ -186,13 +183,22 @@ export default function PostPage() {
         <div className="text-center text-ink-subtle" aria-hidden="true">
           • • •
         </div>
+        {!isHidden && (
+          <div className="flex flex-col items-center gap-3 text-center">
+            <p className="text-sm text-ink-muted">Enjoyed this story? Pass it on.</p>
+            <ShareButton title={post.title} />
+          </div>
+        )}
         <AuthorBox author={post.author} />
-        <div className="text-center">
-          <Link to="/posts" className="text-sm font-semibold text-brand-400 hover:text-brand-300 hover:underline">
-            ← Back to all posts
-          </Link>
-        </div>
       </footer>
+
+      <MoreFromAuthor author={post.author} currentPostId={post.id} />
+
+      <div className="mt-12 text-center">
+        <Link to="/posts" className="text-sm font-semibold text-brand-400 hover:text-brand-300 hover:underline">
+          ← Back to all posts
+        </Link>
+      </div>
 
       <ConfirmDialog
         open={confirmOpen}

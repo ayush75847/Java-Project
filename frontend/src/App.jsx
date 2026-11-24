@@ -28,7 +28,7 @@ export default function App() {
         <Route path="/posts" element={<AllPosts />} />
         <Route path="/services" element={<Services />} />
         <Route path="/about" element={<About />} />
-        <Route path="/posts/:id" element={<PostPage />} />
+        <Route path="/posts/:id" element={<PostRoute />} />
         <Route path="/users/:id" element={<ProfileRoute />} />
         {/* Google sends the user back here (for anyone, logged in or not) */}
         <Route path="/oauth/callback" element={<OAuthCallback />} />
@@ -69,4 +69,10 @@ function EditRoute() {
 function ProfileRoute() {
   const { id } = useParams();
   return <Profile key={id} />;
+}
+
+// key: opening another post (e.g. from "More from ...") starts fresh, no old post on screen
+function PostRoute() {
+  const { id } = useParams();
+  return <PostPage key={id} />;
 }

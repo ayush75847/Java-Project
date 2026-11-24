@@ -1,18 +1,13 @@
-import { useEffect } from "react";
 import { Link } from "react-router";
 import LineIcon from "../components/ui/LineIcon";
 import { useAuth } from "../hooks/useAuth";
+import { useDocumentTitle } from "../hooks/useDocumentTitle";
 
 // /services: everything Inkly does, grouped by who it's for
 export default function Services() {
   const { isLoggedIn } = useAuth();
 
-  useEffect(() => {
-    document.title = "Services · Inkly";
-    return () => {
-      document.title = "Inkly";
-    };
-  }, []);
+  useDocumentTitle("Services");
 
   return (
     <div className="overflow-hidden">

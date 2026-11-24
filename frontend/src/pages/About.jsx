@@ -1,6 +1,6 @@
-import { useEffect } from "react";
 import { Link } from "react-router";
 import { useAuth } from "../hooks/useAuth";
+import { useDocumentTitle } from "../hooks/useDocumentTitle";
 
 const GITHUB_USER = "ayush75847";
 const GITHUB_PROFILE = `https://github.com/${GITHUB_USER}`;
@@ -10,12 +10,7 @@ const GITHUB_REPO = `${GITHUB_PROFILE}/Java-Project`;
 export default function About() {
   const { isLoggedIn } = useAuth();
 
-  useEffect(() => {
-    document.title = "About · Inkly";
-    return () => {
-      document.title = "Inkly";
-    };
-  }, []);
+  useDocumentTitle("About");
 
   return (
     <div className="overflow-hidden">

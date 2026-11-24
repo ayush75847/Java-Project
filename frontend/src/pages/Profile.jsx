@@ -6,6 +6,7 @@ import Alert from "../components/ui/Alert";
 import Avatar from "../components/ui/Avatar";
 import Button from "../components/ui/Button";
 import { useAuth } from "../hooks/useAuth";
+import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { userService } from "../services/userService";
 import { formatDate } from "../utils/format";
 
@@ -41,13 +42,7 @@ export default function Profile() {
   }, [id, reloadKey]);
 
   // Browser tab title: "maya · Inkly"
-  useEffect(() => {
-    if (!profile) return;
-    document.title = `${profile.username} · Inkly`;
-    return () => {
-      document.title = "Inkly";
-    };
-  }, [profile]);
+  useDocumentTitle(profile?.username);
 
   if (notFound) {
     return (
