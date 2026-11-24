@@ -5,6 +5,7 @@ import MainLayout from "./layouts/MainLayout";
 import ComingSoon from "./pages/ComingSoon";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
+import MyPosts from "./pages/MyPosts";
 import NotFound from "./pages/NotFound";
 import OAuthCallback from "./pages/OAuthCallback";
 import PostEditor from "./pages/PostEditor";
@@ -36,7 +37,7 @@ export default function App() {
           <Route path="/write" element={<PostEditor />} />
           {/* key: a fresh editor per post, so its form never shows another post's data */}
           <Route path="/posts/:id/edit" element={<EditRoute />} />
-          <Route path="/my-posts" element={<ComingSoon title="My posts" />} />
+          <Route path="/my-posts" element={<MyPosts />} />
           <Route path="/settings" element={<ComingSoon title="Settings" />} />
         </Route>
 
