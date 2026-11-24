@@ -8,6 +8,7 @@ const LINKS = [
   { to: "/", label: "Home" },
   { to: "/posts", label: "All posts" },
   { to: "/write", label: "Create post" },
+  { to: "/about", label: "About" },
 ];
 
 // The bottom of every page: brand, links, and who built it

@@ -2,6 +2,7 @@ import { Route, Routes, useParams } from "react-router";
 import GuestRoute from "./components/GuestRoute";
 import ProtectedRoute from "./components/ProtectedRoute";
 import MainLayout from "./layouts/MainLayout";
+import About from "./pages/About";
 import AdminDashboard from "./pages/AdminDashboard";
 import AllPosts from "./pages/AllPosts";
 import Home from "./pages/Home";
@@ -24,6 +25,7 @@ export default function App() {
         {/* Public: anyone can see these */}
         <Route path="/" element={<Home />} />
         <Route path="/posts" element={<AllPosts />} />
+        <Route path="/about" element={<About />} />
         <Route path="/posts/:id" element={<PostPage />} />
         <Route path="/users/:id" element={<ProfileRoute />} />
         {/* Google sends the user back here (for anyone, logged in or not) */}
