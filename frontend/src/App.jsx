@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router";
+import { Route, Routes, useParams } from "react-router";
 import GuestRoute from "./components/GuestRoute";
 import ProtectedRoute from "./components/ProtectedRoute";
 import MainLayout from "./layouts/MainLayout";
@@ -7,6 +7,7 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import OAuthCallback from "./pages/OAuthCallback";
+import PostEditor from "./pages/PostEditor";
 import PostPage from "./pages/PostPage";
 import Register from "./pages/Register";
 import VerifyOtp from "./pages/VerifyOtp";
@@ -32,11 +33,9 @@ export default function App() {
 
         {/* Only for logged-IN users (not logged in -> sent to /login, then back here) */}
         <Route element={<ProtectedRoute />}>
-          <Route path="/write" element={<ComingSoon title="Write a post" />} />
-          <Route
-            path="/posts/:id/edit"
-            element={<ComingSoon title="Edit post" />}
-          />
+          <Route path="/write" element={<PostEditor />} />
+          {/* key: a fresh editor per post, so its form never shows another post's data */}
+          <Route path="/posts/:id/edit" element={<EditRoute />} />
           <Route path="/my-posts" element={<ComingSoon title="My posts" />} />
           <Route path="/settings" element={<ComingSoon title="Settings" />} />
         </Route>
@@ -50,4 +49,9 @@ export default function App() {
       </Route>
     </Routes>
   );
+}
+
+function EditRoute() {
+  const { id } = useParams();
+  return <PostEditor key={id} />;
 }
