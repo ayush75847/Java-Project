@@ -2,7 +2,7 @@ import { Route, Routes, useParams } from "react-router";
 import GuestRoute from "./components/GuestRoute";
 import ProtectedRoute from "./components/ProtectedRoute";
 import MainLayout from "./layouts/MainLayout";
-import ComingSoon from "./pages/ComingSoon";
+import AdminDashboard from "./pages/AdminDashboard";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import MyPosts from "./pages/MyPosts";
@@ -45,7 +45,7 @@ export default function App() {
 
         {/* Only for admins */}
         <Route element={<ProtectedRoute adminOnly />}>
-          <Route path="/admin" element={<ComingSoon title="Admin dashboard" />} />
+          <Route path="/admin" element={<AdminDashboard />} />
         </Route>
 
         <Route path="*" element={<NotFound />} />
