@@ -13,6 +13,7 @@ import OAuthCallback from "./pages/OAuthCallback";
 import PostEditor from "./pages/PostEditor";
 import PostPage from "./pages/PostPage";
 import Profile from "./pages/Profile";
+import Services from "./pages/Services";
 import Settings from "./pages/Settings";
 import Register from "./pages/Register";
 import VerifyOtp from "./pages/VerifyOtp";
@@ -25,6 +26,7 @@ export default function App() {
         {/* Public: anyone can see these */}
         <Route path="/" element={<Home />} />
         <Route path="/posts" element={<AllPosts />} />
+        <Route path="/services" element={<Services />} />
         <Route path="/about" element={<About />} />
         <Route path="/posts/:id" element={<PostPage />} />
         <Route path="/users/:id" element={<ProfileRoute />} />

@@ -39,23 +39,22 @@ export default function About() {
         </div>
       </section>
 
-      {/* ---------- What you can do ---------- */}
+      {/* ---------- What we believe (the feature list lives on /services) ---------- */}
       <section className="mx-auto max-w-5xl px-4 py-16">
-        <SectionTitle eyebrow="What Inkly offers" title="Everything a writer needs" />
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {SERVICES.map((s) => (
-            <div
-              key={s.title}
-              className="rounded-2xl border border-line bg-surface-raised p-6 transition hover:-translate-y-0.5 hover:border-brand-500/40"
-            >
-              <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-brand-500/10 text-brand-400 ring-1 ring-brand-500/30">
-                <Icon path={s.icon} />
-              </div>
-              <h3 className="text-lg font-bold text-ink">{s.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-ink-muted">{s.text}</p>
+        <SectionTitle eyebrow="What we believe" title="Words first. Everything else second." />
+        <div className="grid gap-5 md:grid-cols-3">
+          {VALUES.map((v) => (
+            <div key={v.title} className="rounded-2xl border border-line bg-surface-raised p-6">
+              <h3 className="text-lg font-bold text-ink">{v.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-ink-muted">{v.text}</p>
             </div>
           ))}
         </div>
+        <p className="mt-8 text-center">
+          <Link to="/services" className="text-sm font-semibold text-brand-400 hover:text-brand-300 hover:underline">
+            See everything Inkly offers →
+          </Link>
+        </p>
       </section>
 
       {/* ---------- How it works ---------- */}
@@ -201,24 +200,6 @@ function SectionTitle({ eyebrow, title }) {
   );
 }
 
-// Simple outline icons (24x24, drawn with lines)
-function Icon({ path }) {
-  return (
-    <svg
-      className="h-5 w-5"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      {path}
-    </svg>
-  );
-}
-
 function GitHubIcon() {
   return (
     <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -226,70 +207,6 @@ function GitHubIcon() {
     </svg>
   );
 }
-
-const SERVICES = [
-  {
-    title: "Rich text editor",
-    text: "Write with headings, lists, quotes, code blocks and links. What you see while writing is what readers get.",
-    icon: (
-      <>
-        <path d="M12 20h9" />
-        <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
-      </>
-    ),
-  },
-  {
-    title: "Cover images",
-    text: "Give every story a cover photo. Images are stored in the cloud and resized for each device, so pages stay fast.",
-    icon: (
-      <>
-        <rect x="3" y="3" width="18" height="18" rx="3" />
-        <circle cx="9" cy="9" r="2" />
-        <path d="m21 15-5-5L5 21" />
-      </>
-    ),
-  },
-  {
-    title: "Drafts & publishing",
-    text: "Keep a post hidden while you work on it, publish it with one click, and hide it again whenever you like.",
-    icon: (
-      <>
-        <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z" />
-        <circle cx="12" cy="12" r="3" />
-      </>
-    ),
-  },
-  {
-    title: "Your own profile",
-    text: "A public page with your bio and all your published stories, so readers can find everything you've written.",
-    icon: (
-      <>
-        <circle cx="12" cy="8" r="4" />
-        <path d="M4 21a8 8 0 0 1 16 0" />
-      </>
-    ),
-  },
-  {
-    title: "Discover & search",
-    text: "Browse every published story, newest first, and search by title, author or any word inside a post.",
-    icon: (
-      <>
-        <circle cx="11" cy="11" r="7" />
-        <path d="m20 20-3.5-3.5" />
-      </>
-    ),
-  },
-  {
-    title: "Safe sign-in",
-    text: "Sign up with a verified email (6-digit code) or continue with Google. Passwords are always stored hashed.",
-    icon: (
-      <>
-        <rect x="4" y="11" width="16" height="10" rx="2" />
-        <path d="M8 11V7a4 4 0 0 1 8 0v4" />
-      </>
-    ),
-  },
-];
 
 const STEPS = [
   {
@@ -348,5 +265,20 @@ const FAQ = [
   {
     q: "What do admins do?",
     a: "Admins keep the community healthy: they can remove posts that break the rules and manage other users' roles.",
+  },
+];
+
+const VALUES = [
+  {
+    title: "Writing comes first",
+    text: "A quiet editor and a reading page built around the text. No ads, no pop-ups, nothing competing for attention.",
+  },
+  {
+    title: "Your work, your rules",
+    text: "Keep a draft hidden as long as you like, publish when it's ready, and edit or remove it whenever you want.",
+  },
+  {
+    title: "Simple and fast",
+    text: "Pages load quickly on any device, images are resized automatically, and everything works the way you'd expect.",
   },
 ];

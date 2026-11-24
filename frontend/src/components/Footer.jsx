@@ -8,6 +8,7 @@ const LINKS = [
   { to: "/", label: "Home" },
   { to: "/posts", label: "All posts" },
   { to: "/write", label: "Create post" },
+  { to: "/services", label: "Services" },
   { to: "/about", label: "About" },
 ];
 
@@ -29,7 +30,7 @@ export default function Footer() {
           </div>
 
           {/* Links */}
-          <nav aria-label="Footer" className="flex justify-center gap-6 text-sm">
+          <nav aria-label="Footer" className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm">
             {LINKS.map((l) => (
               <Link key={l.to} to={l.to} className="text-ink-muted transition hover:text-brand-400">
                 {l.label}
