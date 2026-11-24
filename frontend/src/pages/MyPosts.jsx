@@ -7,6 +7,7 @@ import Button from "../components/ui/Button";
 import ConfirmDialog from "../components/ui/ConfirmDialog";
 import { postService } from "../services/postService";
 import { formatDate, toPlainText } from "../utils/format";
+import { sizedImage } from "../utils/image";
 
 const FILTERS = [
   { value: "ALL", label: "All" },
@@ -195,7 +196,7 @@ function MyPostRow({ post, busy, onToggle, onDelete }) {
     <li className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center">
       {post.imageUrl && (
         <img
-          src={post.imageUrl}
+          src={sizedImage(post.imageUrl, 300)}
           alt=""
           loading="lazy"
           className="hidden h-16 w-24 shrink-0 rounded-lg object-cover sm:block"

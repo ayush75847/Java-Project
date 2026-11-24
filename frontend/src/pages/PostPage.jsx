@@ -2,7 +2,9 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 import { toast } from "sonner";
 import { getErrorMessage, getErrorStatus } from "../api/client";
+import AuthorBox from "../components/AuthorBox";
 import PostContent from "../components/PostContent";
+import ReadingProgress from "../components/ReadingProgress";
 import Alert from "../components/ui/Alert";
 import Avatar from "../components/ui/Avatar";
 import Button from "../components/ui/Button";
@@ -10,6 +12,7 @@ import ConfirmDialog from "../components/ui/ConfirmDialog";
 import { useAuth } from "../hooks/useAuth";
 import { postService } from "../services/postService";
 import { formatDate, readingTime } from "../utils/format";
+import { sizedImage } from "../utils/image";
 
 // One full post: /posts/:id
 export default function PostPage() {
@@ -95,29 +98,31 @@ export default function PostPage() {
     new Date(post.updatedAt) - new Date(post.createdAt) > 60 * 1000;
 
   return (
-    <article className="mx-auto max-w-3xl px-4 py-10">
-      <Link
-        to="/posts"
-        className="mb-8 inline-flex items-center gap-1 text-sm text-ink-muted transition hover:text-brand-400"
-      >
-        <span aria-hidden="true">←</span> All posts
-      </Link>
+    <article className="px-4 pt-10 pb-20 sm:pt-14">
+      <ReadingProgress />
 
-      {isHidden && (
-        <div className="mb-6">
-          <Alert type="info">
-            This post is hidden. Only{" "}
-            {isOwner ? "you" : "its author"} and admins can see it.
-          </Alert>
-        </div>
-      )}
+      {/* Header: same width as the text below it */}
+      <header className="mx-auto max-w-2xl">
+        <Link
+          to="/posts"
+          className="mb-8 inline-flex items-center gap-1 text-sm text-ink-muted transition hover:text-brand-400"
+        >
+          <span aria-hidden="true">←</span> All posts
+        </Link>
 
-      <header className="space-y-6">
-        <h1 className="text-3xl font-extrabold leading-tight tracking-tight text-ink sm:text-4xl">
+        {isHidden && (
+          <div className="mb-6">
+            <Alert type="info">
+              This post is hidden. Only {isOwner ? "you" : "its author"} and admins can see it.
+            </Alert>
+          </div>
+        )}
+
+        <h1 className="text-3xl leading-[1.15] font-extrabold tracking-tight text-balance text-ink sm:text-5xl sm:leading-[1.1]">
           {post.title}
         </h1>
 
-        <div className="flex flex-wrap items-center justify-between gap-4 border-y border-line py-4">
+        <div className="mt-8 flex flex-wrap items-center justify-between gap-4 border-y border-line py-4">
           <Link
             to={`/users/${post.author.id}`}
             className="group flex items-center gap-3"
@@ -156,20 +161,38 @@ export default function PostPage() {
             </div>
           )}
         </div>
-
       </header>
 
+      {/* Cover image: wider than the text, always the same wide shape (2:1, 16:9 on phones),
+          so every post looks consistent whatever size the uploaded photo was.
+          srcSet lets the browser download the smallest version that is still sharp. */}
       {post.imageUrl && (
-        <img
-          src={post.imageUrl}
-          alt=""
-          className="mt-8 max-h-[28rem] w-full rounded-2xl border border-line object-cover"
-        />
+        <figure className="mx-auto mt-10 max-w-4xl">
+          <img
+            src={sizedImage(post.imageUrl, 1600)}
+            srcSet={[800, 1200, 1600, 2000].map((w) => `${sizedImage(post.imageUrl, w)} ${w}w`).join(", ")}
+            sizes="(min-width: 928px) 896px, calc(100vw - 2rem)"
+            alt=""
+            className="aspect-video w-full rounded-2xl border border-line bg-surface-overlay object-cover sm:aspect-[2/1]"
+          />
+        </figure>
       )}
 
-      <div className="mt-8">
+      <div className="mt-12">
         <PostContent content={post.content} />
       </div>
+
+      <footer className="mx-auto mt-16 max-w-2xl space-y-8">
+        <div className="text-center text-ink-subtle" aria-hidden="true">
+          • • •
+        </div>
+        <AuthorBox author={post.author} />
+        <div className="text-center">
+          <Link to="/posts" className="text-sm font-semibold text-brand-400 hover:text-brand-300 hover:underline">
+            ← Back to all posts
+          </Link>
+        </div>
+      </footer>
 
       <ConfirmDialog
         open={confirmOpen}

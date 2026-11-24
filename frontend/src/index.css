@@ -38,6 +38,9 @@
   --color-success: #34d399; /* emerald */
   --color-danger: #f87171; /* soft red */
   --color-info: #38bdf8; /* sky blue */
+
+  /* Reading font for post content (loaded in index.html). The UI stays sans-serif. */
+  --font-serif: "Source Serif 4", Georgia, Cambria, "Times New Roman", serif;
 }
 
 /* Base styles for the whole app */
@@ -134,54 +137,160 @@ body {
 }
 
 /*
-  The body of a post (see PostContent.jsx).
+  The body of a post (see PostContent.jsx), styled like a real blog:
+  serif reading font, larger text, airy line spacing, a ~68 character line length.
   Its HTML comes from the user, so we can't put Tailwind classes on each tag:
   instead we style the tags from here.
 */
 .post-content {
-  @apply text-[1.0625rem] leading-8 text-ink/90 break-words;
+  font-family: var(--font-serif);
+  font-size: 1.1875rem; /* 19px: comfortable for long reading */
+  line-height: 1.85;
+  color: rgb(245 245 244 / 0.88);
+  max-width: 68ch;
+  margin-inline: auto;
+  overflow-wrap: break-word;
+  font-feature-settings: "kern", "liga", "onum"; /* nicer kerning, old-style numbers */
 }
+@media (max-width: 640px) {
+  .post-content {
+    font-size: 1.0625rem; /* 17px on phones */
+    line-height: 1.8;
+  }
+}
+
+/* Space between blocks */
 .post-content > * + * {
-  @apply mt-5;
+  margin-top: 1.5em;
 }
+
+/* Opening paragraph: a little larger, with an orange drop cap like printed magazines */
+.post-content > p:first-child {
+  font-size: 1.12em;
+  color: var(--color-ink);
+}
+.post-content > p:first-child::first-letter {
+  float: left;
+  font-size: 3.6em;
+  line-height: 0.8;
+  font-weight: 700;
+  margin: 0.08em 0.1em 0 0;
+  color: var(--color-brand-500);
+}
+
+/* Headings switch back to the sans font, so they stand out from the text */
 .post-content h1,
 .post-content h2 {
-  @apply mt-10 text-2xl font-bold leading-snug text-ink;
+  margin-top: 2.2em;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 1.6em;
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  color: var(--color-ink);
 }
 .post-content h3,
 .post-content h4 {
-  @apply mt-8 text-xl font-semibold text-ink;
+  margin-top: 1.8em;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 1.25em;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--color-ink);
 }
+/* A heading pulls the next paragraph closer to it */
+.post-content :is(h1, h2, h3, h4) + * {
+  margin-top: 0.6em;
+}
+
 .post-content strong {
-  @apply font-semibold text-ink;
+  font-weight: 700;
+  color: var(--color-ink);
 }
+.post-content em {
+  font-style: italic;
+}
+
 .post-content a {
-  @apply text-brand-400 underline underline-offset-2 hover:text-brand-300;
+  color: var(--color-brand-400);
+  text-decoration: underline;
+  text-decoration-color: rgb(249 115 22 / 0.45);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  transition: color 0.15s, text-decoration-color 0.15s;
+}
+.post-content a:hover {
+  color: var(--color-brand-300);
+  text-decoration-color: currentColor;
+}
+
+.post-content ul,
+.post-content ol {
+  padding-left: 1.4em;
 }
 .post-content ul {
-  @apply list-disc space-y-2 pl-6;
+  list-style: disc;
 }
 .post-content ol {
-  @apply list-decimal space-y-2 pl-6;
+  list-style: decimal;
+}
+.post-content li + li {
+  margin-top: 0.5em;
 }
 .post-content li::marker {
-  @apply text-brand-500;
+  color: var(--color-brand-500);
 }
+
+/* Quotes: big, italic, with an orange bar */
 .post-content blockquote {
-  @apply border-l-4 border-brand-500 pl-4 italic text-ink-muted;
+  border-left: 3px solid var(--color-brand-500);
+  padding: 0.2em 0 0.2em 1.2em;
+  font-size: 1.15em;
+  font-style: italic;
+  line-height: 1.6;
+  color: var(--color-ink);
 }
+
+/* Code stays monospace and smaller */
 .post-content code {
-  @apply rounded bg-surface-overlay px-1.5 py-0.5 font-mono text-[0.9em] text-brand-300;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.82em;
+  padding: 0.15em 0.4em;
+  border-radius: 0.375rem;
+  background: var(--color-surface-overlay);
+  color: var(--color-brand-300);
 }
 .post-content pre {
-  @apply overflow-x-auto rounded-xl border border-line bg-surface-raised p-4 text-sm leading-6;
+  overflow-x: auto;
+  padding: 1.1em 1.25em;
+  border: 1px solid var(--color-line);
+  border-radius: 0.75rem;
+  background: var(--color-surface-raised);
+  font-size: 0.82em;
+  line-height: 1.7;
 }
 .post-content pre code {
-  @apply bg-transparent p-0 text-ink;
+  padding: 0;
+  font-size: 1em;
+  background: transparent;
+  color: var(--color-ink);
 }
+
 .post-content img {
-  @apply rounded-xl border border-line;
+  border-radius: 0.75rem;
+  border: 1px solid var(--color-line);
 }
+
+/* A thin line becomes three dots, a classic section break */
 .post-content hr {
-  @apply my-10 border-line;
+  border: 0;
+  margin: 2.5em 0;
+  height: 1.5em;
+  overflow: visible; /* browsers clip an <hr>'s ::after by default */
+  text-align: center;
+}
+.post-content hr::after {
+  content: "• • •";
+  letter-spacing: 0.6em;
+  color: var(--color-ink-subtle);
 }

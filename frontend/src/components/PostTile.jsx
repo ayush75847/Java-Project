@@ -1,5 +1,6 @@
 import { Link } from "react-router";
 import { readingTime, timeAgo, toPlainText } from "../utils/format";
+import { sizedImage } from "../utils/image";
 import Avatar from "./ui/Avatar";
 
 // A tall card with the picture on top, for grids (the home page "Latest stories").
@@ -12,7 +13,7 @@ export default function PostTile({ post }) {
       <div className="aspect-[16/9] overflow-hidden bg-surface-overlay">
         {post.imageUrl ? (
           <img
-            src={post.imageUrl}
+            src={sizedImage(post.imageUrl, 800)}
             alt=""
             loading="lazy"
             className="h-full w-full object-cover transition duration-500 group-hover:scale-105"

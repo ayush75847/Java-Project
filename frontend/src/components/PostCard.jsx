@@ -1,5 +1,6 @@
 import { Link } from "react-router";
 import { readingTime, timeAgo, toPlainText } from "../utils/format";
+import { sizedImage } from "../utils/image";
 import Avatar from "./ui/Avatar";
 
 // One post in a list: author, title, a short preview and the image (if any).
@@ -49,7 +50,7 @@ export default function PostCard({ post }) {
 
       {post.imageUrl && (
         <img
-          src={post.imageUrl}
+          src={sizedImage(post.imageUrl, 400)}
           alt=""
           loading="lazy"
           className="h-20 w-20 shrink-0 self-center rounded-xl object-cover sm:h-28 sm:w-36"
