@@ -7,6 +7,7 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import OAuthCallback from "./pages/OAuthCallback";
+import PostPage from "./pages/PostPage";
 import Register from "./pages/Register";
 import VerifyOtp from "./pages/VerifyOtp";
 
@@ -17,7 +18,7 @@ export default function App() {
       <Route element={<MainLayout />}>
         {/* Public: anyone can see these */}
         <Route path="/" element={<Home />} />
-        <Route path="/posts/:id" element={<ComingSoon title="Post" />} />
+        <Route path="/posts/:id" element={<PostPage />} />
         <Route path="/users/:id" element={<ComingSoon title="Profile" />} />
         {/* Google sends the user back here (for anyone, logged in or not) */}
         <Route path="/oauth/callback" element={<OAuthCallback />} />
@@ -32,6 +33,10 @@ export default function App() {
         {/* Only for logged-IN users (not logged in -> sent to /login, then back here) */}
         <Route element={<ProtectedRoute />}>
           <Route path="/write" element={<ComingSoon title="Write a post" />} />
+          <Route
+            path="/posts/:id/edit"
+            element={<ComingSoon title="Edit post" />}
+          />
           <Route path="/my-posts" element={<ComingSoon title="My posts" />} />
           <Route path="/settings" element={<ComingSoon title="Settings" />} />
         </Route>
