@@ -10,6 +10,8 @@ import NotFound from "./pages/NotFound";
 import OAuthCallback from "./pages/OAuthCallback";
 import PostEditor from "./pages/PostEditor";
 import PostPage from "./pages/PostPage";
+import Profile from "./pages/Profile";
+import Settings from "./pages/Settings";
 import Register from "./pages/Register";
 import VerifyOtp from "./pages/VerifyOtp";
 
@@ -21,7 +23,7 @@ export default function App() {
         {/* Public: anyone can see these */}
         <Route path="/" element={<Home />} />
         <Route path="/posts/:id" element={<PostPage />} />
-        <Route path="/users/:id" element={<ComingSoon title="Profile" />} />
+        <Route path="/users/:id" element={<ProfileRoute />} />
         {/* Google sends the user back here (for anyone, logged in or not) */}
         <Route path="/oauth/callback" element={<OAuthCallback />} />
 
@@ -38,7 +40,7 @@ export default function App() {
           {/* key: a fresh editor per post, so its form never shows another post's data */}
           <Route path="/posts/:id/edit" element={<EditRoute />} />
           <Route path="/my-posts" element={<MyPosts />} />
-          <Route path="/settings" element={<ComingSoon title="Settings" />} />
+          <Route path="/settings" element={<Settings />} />
         </Route>
 
         {/* Only for admins */}
@@ -55,4 +57,10 @@ export default function App() {
 function EditRoute() {
   const { id } = useParams();
   return <PostEditor key={id} />;
+}
+
+// key: going from one profile to another starts fresh (no old user's data shown)
+function ProfileRoute() {
+  const { id } = useParams();
+  return <Profile key={id} />;
 }
