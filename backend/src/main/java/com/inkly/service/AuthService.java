@@ -154,7 +154,7 @@ public class AuthService {
         user.setOtpAttempts(0);
         userRepository.save(user);
 
-        emailService.sendOtp(user.getEmail(), code);
+        emailService.sendOtp(user.getEmail(), user.getUsername(), code, OTP_VALIDITY.toMinutes());
     }
 
     private User findByEmail(String email) {
