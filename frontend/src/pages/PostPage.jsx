@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router";
+import { Link, useLocation, useNavigate, useParams } from "react-router";
 import { toast } from "sonner";
 import { getErrorMessage, getErrorStatus } from "../api/client";
 import AuthorBox from "../components/AuthorBox";
+import LoginGate from "../components/LoginGate";
 import MoreFromAuthor from "../components/MoreFromAuthor";
 import PostContent from "../components/PostContent";
 import ReadingProgress from "../components/ReadingProgress";
@@ -93,6 +94,8 @@ export default function PostPage() {
   // Saved again more than a minute after it was created
   const wasEdited =
     new Date(post.updatedAt) - new Date(post.createdAt) > 60 * 1000;
+  // From the backend: reading time of the FULL post, even when only a preview was sent
+  const minutes = post.readingMinutes ?? readingTime(post.content);
 
   return (
     <article className="px-4 pt-10 pb-20 sm:pt-14">
@@ -134,7 +137,7 @@ export default function PostPage() {
                   {formatDate(post.createdAt)}
                 </time>
                 {" · "}
-                {readingTime(post.content)} min read
+                {minutes} min read
                 {wasEdited && " · edited"}
               </p>
             </div>
@@ -160,6 +163,9 @@ export default function PostPage() {
         </div>
       </header>
 
+      {/* Visitors: say right away that this is only a preview */}
+      {post.preview && <PreviewNotice />}
+
       {/* Cover image: wider than the text, always the same wide shape (2:1, 16:9 on phones),
           so every post looks consistent whatever size the uploaded photo was.
           srcSet lets the browser download the smallest version that is still sharp. */}
@@ -175,15 +181,26 @@ export default function PostPage() {
         </figure>
       )}
 
-      <div className="mt-12">
-        <PostContent content={post.content} />
-      </div>
+      {post.preview ? (
+        <>
+          {/* Visitor: only the start of the post came from the backend. Fade it out, then the login box. */}
+          <div className="mt-12 [mask-image:linear-gradient(to_bottom,black_45%,transparent)]">
+            <PostContent content={post.content} />
+          </div>
+          <LoginGate author={post.author} readingMinutes={minutes} />
+        </>
+      ) : (
+        <div className="mt-12">
+          <PostContent content={post.content} />
+        </div>
+      )}
 
       <footer className="mx-auto mt-16 max-w-2xl space-y-8">
         <div className="text-center text-ink-subtle" aria-hidden="true">
           • • •
         </div>
-        {!isHidden && (
+        {/* "Enjoyed this story?" only makes sense after reading all of it */}
+        {!isHidden && !post.preview && (
           <div className="flex flex-col items-center gap-3 text-center">
             <p className="text-sm text-ink-muted">Enjoyed this story? Pass it on.</p>
             <ShareButton title={post.title} />
@@ -213,6 +230,36 @@ export default function PostPage() {
           : `You are deleting ${post.author.username}'s post as an admin. This can't be undone.`}
       </ConfirmDialog>
     </article>
+  );
+}
+
+// The bar under the post header for visitors: "You're reading a preview. Log in to view the full blog."
+function PreviewNotice() {
+  const { pathname } = useLocation();
+
+  return (
+    <div
+      role="status"
+      className="mx-auto mt-6 flex max-w-2xl flex-col items-start gap-3 rounded-xl border border-brand-500/40 bg-brand-500/10 px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
+    >
+      <p className="flex items-center gap-2.5 text-sm text-ink">
+        <svg className="h-4 w-4 shrink-0 text-brand-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <rect x="4" y="11" width="16" height="10" rx="2" />
+          <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+        </svg>
+        <span>
+          You&apos;re reading a preview. <strong className="font-semibold">Log in to view the full blog.</strong>
+        </span>
+      </p>
+      {/* state.from: after logging in, come straight back to this post */}
+      <Link
+        to="/login"
+        state={{ from: pathname }}
+        className="shrink-0 rounded-lg bg-brand-500 px-4 py-1.5 text-sm font-semibold text-ink-inverse transition hover:bg-brand-400"
+      >
+        Log in
+      </Link>
+    </div>
   );
 }
 

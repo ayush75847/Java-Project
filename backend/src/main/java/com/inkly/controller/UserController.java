@@ -43,8 +43,10 @@ public class UserController {
         return ResponseEntity.ok(ApiResponse.ok("Profile", userService.getProfile(id)));
     }
 
+    // Public: full posts when logged in, a preview of each post for visitors
     @GetMapping("/{id}/posts")
-    public ResponseEntity<ApiResponse<List<PostResponse>>> getUserPosts(@PathVariable String id) {
-        return ResponseEntity.ok(ApiResponse.ok("Posts", userService.getUserPosts(id)));
+    public ResponseEntity<ApiResponse<List<PostResponse>>> getUserPosts(@PathVariable String id,
+            Authentication auth) {
+        return ResponseEntity.ok(ApiResponse.ok("Posts", userService.getUserPosts(id, auth != null)));
     }
 }

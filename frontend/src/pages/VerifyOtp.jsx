@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router";
+import { Link, useLocation, useNavigate, useSearchParams } from "react-router";
 import { toast } from "sonner";
 import { getErrorMessage, getErrorStatus } from "../api/client";
 import AuthCard from "../components/AuthCard";
@@ -17,6 +17,7 @@ export default function VerifyOtp() {
   const [searchParams] = useSearchParams();
   const email = searchParams.get("email") || "";
   const navigate = useNavigate();
+  const location = useLocation();
   const { saveLogin } = useAuth();
 
   const [code, setCode] = useState("");
@@ -54,7 +55,8 @@ export default function VerifyOtp() {
       const { token, user } = await authService.verifyOtp(email, code);
       saveLogin(token, user); // verified = logged in straight away
       toast.success(`Email verified. Welcome to Inkly, ${user.username}!`);
-      navigate("/", { replace: true });
+      // Back to where the visitor started (e.g. the post they were reading), or home
+      navigate(location.state?.from || "/", { replace: true });
     } catch (err) {
       setError(getErrorMessage(err)); // e.g. "Wrong code (3 attempts left)"
     } finally {

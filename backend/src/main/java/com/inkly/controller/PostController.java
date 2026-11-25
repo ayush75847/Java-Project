@@ -34,10 +34,10 @@ public class PostController {
         this.postService = postService;
     }
 
-    // Public
+    // Public: full posts when logged in, a preview of each post for visitors
     @GetMapping
-    public ResponseEntity<ApiResponse<List<PostResponse>>> getActivePosts() {
-        return ResponseEntity.ok(ApiResponse.ok("Posts", postService.getActivePosts()));
+    public ResponseEntity<ApiResponse<List<PostResponse>>> getActivePosts(Authentication auth) {
+        return ResponseEntity.ok(ApiResponse.ok("Posts", postService.getActivePosts(auth != null)));
     }
 
     // Logged in (this rule is in SecurityConfig)
@@ -46,7 +46,7 @@ public class PostController {
         return ResponseEntity.ok(ApiResponse.ok("My posts", postService.getMyPosts(auth.getName())));
     }
 
-    // Public, but owner/admin can also see INACTIVE posts
+    // Public (only a preview of the text for visitors), owner/admin can also see INACTIVE posts
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<PostResponse>> getPost(@PathVariable String id, Authentication auth) {
         PostResponse post = postService.getPost(id, userId(auth), isAdmin(auth));

@@ -46,7 +46,7 @@ export default function PostTile({ post }) {
           <span aria-hidden="true">·</span>
           <span>{timeAgo(post.createdAt)}</span>
           <span aria-hidden="true">·</span>
-          <span>{readingTime(post.content)} min</span>
+          <span>{post.readingMinutes ?? readingTime(post.content)} min</span>
         </div>
       </div>
     </article>

@@ -63,7 +63,7 @@ export default function Login() {
         toast.info("Please verify your email first", {
           description: `Enter the code we sent to ${email}`,
         });
-        navigate(`/verify?email=${encodeURIComponent(email)}`);
+        navigate(`/verify?email=${encodeURIComponent(email)}`, { state: location.state });
         return;
       }
       setServerError(getErrorMessage(err));
@@ -81,6 +81,7 @@ export default function Login() {
           New to Inkly?{" "}
           <Link
             to="/register"
+            state={location.state}
             className="font-medium text-brand-400 hover:text-brand-300 hover:underline"
           >
             Create an account

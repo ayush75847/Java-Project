@@ -30,9 +30,10 @@ public class UserService {
         return ProfileResponse.from(findUser(userId));
     }
 
-    public List<PostResponse> getUserPosts(String userId) {
+    // fullContent = false for visitors who are not logged in (preview of each post only)
+    public List<PostResponse> getUserPosts(String userId, boolean fullContent) {
         findUser(userId); // 404 if the user doesn't exist
-        return postService.getActivePostsByUser(userId);
+        return postService.getActivePostsByUser(userId, fullContent);
     }
 
     // ---------- Logged-in user (always their OWN profile) ----------

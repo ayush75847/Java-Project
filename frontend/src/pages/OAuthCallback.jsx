@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router";
 import { toast } from "sonner";
 import { tokenStorage } from "../api/client";
 import AuthCard from "../components/AuthCard";
+import { AFTER_GOOGLE_LOGIN_KEY } from "../components/GoogleButton";
 import Alert from "../components/ui/Alert";
 import Spinner from "../components/ui/Spinner";
 import { useAuth } from "../hooks/useAuth";
@@ -12,6 +13,19 @@ import { authService } from "../services/authService";
 function readFromUrl() {
   const params = new URLSearchParams(window.location.hash.slice(1));
   return { token: params.get("token"), error: params.get("error") };
+}
+
+// The page saved by GoogleButton before leaving for Google (e.g. the post being read), used once.
+// Only paths inside our own app are accepted, never a full URL to another website.
+function takeReturnPath() {
+  try {
+    const path = sessionStorage.getItem(AFTER_GOOGLE_LOGIN_KEY);
+    sessionStorage.removeItem(AFTER_GOOGLE_LOGIN_KEY);
+    if (path && path.startsWith("/") && !path.startsWith("//")) return path;
+  } catch {
+    // storage blocked: go home
+  }
+  return "/";
 }
 
 export default function OAuthCallback() {
@@ -38,7 +52,7 @@ export default function OAuthCallback() {
         toast.success("Signed in with Google", {
           description: `Welcome, ${user.username}!`,
         });
-        navigate("/", { replace: true });
+        navigate(takeReturnPath(), { replace: true });
       })
       .catch(() => {
         tokenStorage.clear();

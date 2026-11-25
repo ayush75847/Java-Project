@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import { toast } from "sonner";
 import { getErrorMessage } from "../api/client";
 import AuthCard from "../components/AuthCard";
@@ -25,6 +25,7 @@ const EMPTY_FORM = {
 
 export default function Register() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [form, setForm] = useState(EMPTY_FORM);
   const [errors, setErrors] = useState({});
   const [serverError, setServerError] = useState("");
@@ -65,7 +66,8 @@ export default function Register() {
         description: `We sent a 6-digit code to ${email}`,
       });
       // Next step: enter the code we just emailed. The email travels in the URL so a refresh keeps it.
-      navigate(`/verify?email=${encodeURIComponent(email)}`);
+      // state.from (e.g. a post the visitor was reading) travels on, so after the code they land back there
+      navigate(`/verify?email=${encodeURIComponent(email)}`, { state: location.state });
     } catch (err) {
       setServerError(getErrorMessage(err));
     } finally {
@@ -82,6 +84,7 @@ export default function Register() {
           Already have an account?{" "}
           <Link
             to="/login"
+            state={location.state}
             className="font-medium text-brand-400 hover:text-brand-300 hover:underline"
           >
             Log in

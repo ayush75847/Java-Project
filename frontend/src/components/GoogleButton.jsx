@@ -1,10 +1,29 @@
+import { useLocation } from "react-router";
 import { authService } from "../services/authService";
 
-// "Continue with Google": a normal link, because the whole page must go to Google
-export default function GoogleButton({ label = "Continue with Google" }) {
+// Where to go after Google sends the user back (read by OAuthCallback.jsx).
+// The trip to Google leaves our app completely, so React state can't carry it: sessionStorage can.
+export const AFTER_GOOGLE_LOGIN_KEY = "inkly_after_google_login";
+
+// "Continue with Google": a normal link, because the whole page must go to Google.
+// redirectTo: page to come back to afterwards (default: the page that sent us to /login, if any)
+export default function GoogleButton({ label = "Continue with Google", redirectTo }) {
+  const location = useLocation();
+
+  function rememberWhereToReturn() {
+    const target = redirectTo || location.state?.from;
+    try {
+      if (target) sessionStorage.setItem(AFTER_GOOGLE_LOGIN_KEY, target);
+      else sessionStorage.removeItem(AFTER_GOOGLE_LOGIN_KEY);
+    } catch {
+      // storage blocked (private mode etc.): we'll just land on the home page
+    }
+  }
+
   return (
     <a
       href={authService.googleLoginUrl}
+      onClick={rememberWhereToReturn}
       className="flex w-full items-center justify-center gap-3 rounded-lg border border-line-strong bg-surface-overlay px-4 py-2.5 text-sm font-semibold text-ink transition hover:border-brand-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
     >
       {/* Google's official "G" logo colors */}

@@ -49,12 +49,13 @@ public class PostService {
 
     // ---------- Read ----------
 
-    // Public feed: only ACTIVE posts, newest first
-    public List<PostResponse> getActivePosts() {
-        return toResponses(postRepository.findByStatusOrderByCreatedAtDesc(PostStatus.ACTIVE));
+    // Public feed: only ACTIVE posts, newest first.
+    // fullContent = false for visitors who are not logged in: they only get a preview of each post.
+    public List<PostResponse> getActivePosts(boolean fullContent) {
+        return toResponses(postRepository.findByStatusOrderByCreatedAtDesc(PostStatus.ACTIVE), fullContent);
     }
 
-    // userId is null when nobody is logged in
+    // userId is null when nobody is logged in: then only a preview of the text is returned
     public PostResponse getPost(String postId, String userId, boolean isAdmin) {
         Post post = findPost(postId);
 
@@ -62,16 +63,17 @@ public class PostService {
         if (post.getStatus() == PostStatus.INACTIVE && !isOwner(post, userId) && !isAdmin) {
             throw new ApiException(HttpStatus.NOT_FOUND, "Post not found");
         }
-        return toResponse(post);
+        return toResponse(post, userId != null);
     }
 
     public List<PostResponse> getMyPosts(String userId) {
         return toResponses(postRepository.findByUserIdOrderByCreatedAtDesc(userId));
     }
 
-    // Someone's public profile page: only their ACTIVE posts
-    public List<PostResponse> getActivePostsByUser(String userId) {
-        return toResponses(postRepository.findByUserIdAndStatusOrderByCreatedAtDesc(userId, PostStatus.ACTIVE));
+    // Someone's public profile page: only their ACTIVE posts (a preview each for visitors)
+    public List<PostResponse> getActivePostsByUser(String userId, boolean fullContent) {
+        return toResponses(postRepository.findByUserIdAndStatusOrderByCreatedAtDesc(userId, PostStatus.ACTIVE),
+                fullContent);
     }
 
     // Admin: every post, ACTIVE and INACTIVE
@@ -158,18 +160,26 @@ public class PostService {
     }
 
     private PostResponse toResponse(Post post) {
+        return toResponse(post, true);
+    }
+
+    private PostResponse toResponse(Post post, boolean fullContent) {
         User author = userRepository.findById(post.getUserId()).orElse(null);
-        return PostResponse.from(post, author);
+        return PostResponse.from(post, author, fullContent);
+    }
+
+    private List<PostResponse> toResponses(List<Post> posts) {
+        return toResponses(posts, true);
     }
 
     // For lists: load all authors in ONE query instead of one query per post
-    private List<PostResponse> toResponses(List<Post> posts) {
+    private List<PostResponse> toResponses(List<Post> posts, boolean fullContent) {
         Set<String> authorIds = posts.stream().map(Post::getUserId).collect(Collectors.toSet());
         Map<String, User> authors = userRepository.findAllById(authorIds).stream()
                 .collect(Collectors.toMap(User::getId, Function.identity()));
 
         return posts.stream()
-                .map(post -> PostResponse.from(post, authors.get(post.getUserId())))
+                .map(post -> PostResponse.from(post, authors.get(post.getUserId()), fullContent))
                 .toList();
     }
 }

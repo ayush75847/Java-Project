@@ -44,7 +44,7 @@ export default function PostCard({ post }) {
         )}
 
         <p className="text-xs text-ink-subtle">
-          {readingTime(post.content)} min read
+          {post.readingMinutes ?? readingTime(post.content)} min read
         </p>
       </div>
 
